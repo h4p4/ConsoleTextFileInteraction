@@ -349,14 +349,21 @@ MigrationBackup/
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
 
-### VisualStudioCode ###
+# VisualStudioCode
 .vscode/*      
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
 
-### VisualStudioCode Patch ###
+# VisualStudioCode Patch
 # Ignore all local history of files
 **/.history
 
+### obj and bin folders
+*.suo
+*.user
+_ReSharper.*
+bin
+obj
+packages
