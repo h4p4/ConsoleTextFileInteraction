@@ -4,8 +4,8 @@ namespace ConsoleTextFileInteraction
     {
         private static int _count = 1;
         private int _id;
-        string _itemText;
-        Delegate _command;
+        private string _itemText;
+        private Delegate _command;
         public int Id => _id;
 
         public MenuItem(string itemText, Delegate command)
