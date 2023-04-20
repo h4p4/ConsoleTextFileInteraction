@@ -40,7 +40,9 @@ namespace ConsoleTextFileInteraction
         {
             Console.Clear();
             menu.Show();
-            menu.ElementAt(GetIndexFromKey(inputToHandle)).InvokeMethod();
+            try {
+                menu.ElementAt(GetIndexFromKey(inputToHandle)).InvokeMethod();
+            } catch(Exception ex) { }
         }
         private static void CreateFile()
         {
@@ -80,22 +82,19 @@ namespace ConsoleTextFileInteraction
 
         private static void ReadFile()
         {
-            Console.Clear();
-            menu.Show();
             Console.WriteLine("\nВыберите файл для чтения:");
             var readFile = PrintFiles(0);
-            // логика удаления выбранного файла здесь, в переменной readFile хранится выбранный из списка файлов файл.
-            // ...
+            if(readFile == null) return;
+
         }
 
         private static void DeleteFile()
         {
-            Console.Clear();
-            menu.Show();
             Console.WriteLine("\nВыберите файл для для удаления:");
             var readFile = PrintFiles(0);
-            // логика удаления выбранного файла здесь, в переменной readFile хранится выбранный из списка файлов файл.
-            // ...
+            if(readFile == null) return;
+            File.Delete(readFile.Name);
+            _files.Remove(_files.Where(x => x.Name == readFile.Name).First());
         }
 
         private static string GetFullFilePathWithExtension(string fileName) =>
@@ -114,7 +113,8 @@ namespace ConsoleTextFileInteraction
         }
         private static FileStream PrintFiles(int selectedFileIndex)
         {
-
+            Console.Clear();
+            menu.Show();
             int index = 0;
             foreach (var file in _files)
             {
