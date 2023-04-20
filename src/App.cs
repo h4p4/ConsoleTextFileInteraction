@@ -80,12 +80,13 @@ namespace ConsoleTextFileInteraction
 
         private static void ReadFile()
         {
-            Console.Clear();
-            menu.Show();
             Console.WriteLine("\nВыберите файл для чтения:");
             var readFile = PrintFiles(0);
-            // логика удаления выбранного файла здесь, в переменной readFile хранится выбранный из списка файлов файл.
-            // ...
+            using (var reader = new StreamReader(readFile.Name)){
+                var fileContent = reader.ReadToEnd();
+                Console.WriteLine(fileContent);
+                Console.ReadKey();
+            }
         }
 
         private static void DeleteFile()
@@ -114,7 +115,8 @@ namespace ConsoleTextFileInteraction
         }
         private static FileStream PrintFiles(int selectedFileIndex)
         {
-
+            Console.Clear();
+            menu.Show();
             int index = 0;
             foreach (var file in _files)
             {
