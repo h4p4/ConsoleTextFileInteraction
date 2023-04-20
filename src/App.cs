@@ -40,9 +40,11 @@ namespace ConsoleTextFileInteraction
         {
             Console.Clear();
             menu.Show();
-            try {
+            try
+            {
                 menu.ElementAt(GetIndexFromKey(inputToHandle)).InvokeMethod();
-            } catch(Exception ex) { }
+            }
+            catch (Exception ex) { }
         }
         private static void CreateFile()
         {
@@ -84,15 +86,20 @@ namespace ConsoleTextFileInteraction
         {
             Console.WriteLine("\nВыберите файл для чтения:");
             var readFile = PrintFiles(0);
-            if(readFile == null) return;
-
+            if (readFile == null) return;
+            using (var reader = new StreamReader(readFile.Name))
+            {
+                var fileContent = reader.ReadToEnd();
+                Console.WriteLine(fileContent);
+                Console.ReadKey();
+            }
         }
 
         private static void DeleteFile()
         {
             Console.WriteLine("\nВыберите файл для для удаления:");
             var readFile = PrintFiles(0);
-            if(readFile == null) return;
+            if (readFile == null) return;
             File.Delete(readFile.Name);
             _files.Remove(_files.Where(x => x.Name == readFile.Name).First());
         }
