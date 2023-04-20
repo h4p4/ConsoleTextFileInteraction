@@ -1,19 +1,29 @@
+using System;
 using System.Runtime.InteropServices;
+using System.Collections.Generic;
+using System.Linq;
+using System.IO;
 
 namespace ConsoleTextFileInteraction
 {
     public class App
     {
+        private const int OFFSET = 48;
         private const string FILE_FOLDER = "txt";
         private const string FILE_FORMAT = ".txt";
-        private static List<FileInfo> _files = new();
+        private static List<FileStream> _files = new();
         private static Menu menu = new Menu(
                 new MenuItem("Создать файл", () => CreateFile()),
                 new MenuItem("Открыть файл", () => ReadFile()),
                 new MenuItem("Удалить файл", () => DeleteFile())
             );
-        static App(){
-            // _files.Add(new FileInfo());
+        static App()
+        {
+            var filenames = new List<string>(Directory.GetFiles(FILE_FOLDER));
+            List<FileStream> files = new();
+            foreach (var fName in filenames)
+                files.Add(new FileStream(fName, FileMode.Open));
+            _files.AddRange(files);
         }
         public static void Run()
         {
@@ -28,11 +38,9 @@ namespace ConsoleTextFileInteraction
         }
         private static void HandleInput(ConsoleKey inputToHandle)
         {
-            const int OFFSET = 48;
             Console.Clear();
             menu.Show();
             menu.ElementAt(GetIndexFromKey(inputToHandle)).InvokeMethod();
-            int GetIndexFromKey(ConsoleKey key) => (int)key - OFFSET;
         }
         private static void CreateFile()
         {
@@ -66,27 +74,82 @@ namespace ConsoleTextFileInteraction
                 errorMessage = ex.Message;
                 return false;
             }
+            _files.Add(file);
             return true;
         }
 
         private static void ReadFile()
         {
-            throw new NotImplementedException();
+            Console.Clear();
+            menu.Show();
+            Console.WriteLine("\nВыберите файл для чтения:");
+            var readFile = PrintFiles(0);
+            // логика удаления выбранного файла здесь, в переменной readFile хранится выбранный из списка файлов файл.
+            // ...
         }
 
         private static void DeleteFile()
         {
-            throw new NotImplementedException();
+            Console.Clear();
+            menu.Show();
+            Console.WriteLine("\nВыберите файл для для удаления:");
+            var readFile = PrintFiles(0);
+            // логика удаления выбранного файла здесь, в переменной readFile хранится выбранный из списка файлов файл.
+            // ...
         }
 
         private static string GetFullFilePathWithExtension(string fileName) =>
         RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ?
          FILE_FOLDER + "\\" + fileName + FILE_FORMAT :
          FILE_FOLDER + "/" + fileName + FILE_FORMAT;
+        private static string GetFullFilePathWithoutExtension(string fileName) =>
+       RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ?
+        FILE_FOLDER + "\\" + fileName :
+        FILE_FOLDER + "/" + fileName;
+
         private static void WriteLineAndHold(string message, double secondsToHold)
         {
             Console.WriteLine(message);
             Thread.Sleep(Convert.ToInt32(secondsToHold * 1000));
         }
+        private static FileStream PrintFiles(int selectedFileIndex)
+        {
+
+            int index = 0;
+            foreach (var file in _files)
+            {
+                index++;
+                if (_files.ElementAt(selectedFileIndex) == file)
+                {
+                    Console.WriteLine(">> " + index.ToString() + ". " + file.Name + " <<");
+                    continue;
+                }
+                Console.WriteLine(index.ToString() + ". " + file.Name);
+            }
+            var chosenFile = HandleChoose();
+            return chosenFile;
+
+            FileStream HandleChoose()
+            {
+                ConsoleKey pressedKey = Console.ReadKey(false).Key;
+                if (pressedKey != ConsoleKey.Enter) HandleInput();
+                return _files.ElementAt(selectedFileIndex);
+
+
+                void HandleInput()
+                {
+                    switch (pressedKey)
+                    {
+                        case ConsoleKey.UpArrow: PrintFiles(IsValidIndex(--selectedFileIndex) ? selectedFileIndex : ++selectedFileIndex); break;
+                        case ConsoleKey.DownArrow: PrintFiles(IsValidIndex(++selectedFileIndex) ? selectedFileIndex : --selectedFileIndex); break;
+                        case ConsoleKey.Escape: break;
+                        default: HandleInput(); break;
+                    }
+                }
+            }
+            bool IsValidIndex(int indx) => (indx >= 0 && indx <= _files.Count - 1);
+        }
+
+        private static int GetIndexFromKey(ConsoleKey key) => (int)key - OFFSET;
     }
 }
